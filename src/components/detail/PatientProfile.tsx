@@ -21,6 +21,9 @@ export const PatientProfile: React.FC<PatientProfileProps> = ({ resident }) => {
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-700 font-bold text-xs border border-indigo-200">
+                {resident.facilityId === 'fac-001' ? 'さくら介護老人保健施設' : resident.facilityId === 'fac-002' ? 'ひまわり訪問看護' : 'MAMORU吉祥寺'}
+              </span>
               <span className="px-2 py-0.5 rounded-md bg-slate-100 font-bold text-xs text-slate-700">
                 {resident.roomNumber}
               </span>

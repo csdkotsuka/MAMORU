@@ -3,6 +3,7 @@ import { Resident } from '../types';
 export const INITIAL_RESIDENTS: Resident[] = [
   {
     id: 'res-001',
+    facilityId: 'fac-001',
     name: '佐藤 正男',
     nameKana: 'サトウ マサオ',
     age: 79,
@@ -39,6 +40,7 @@ export const INITIAL_RESIDENTS: Resident[] = [
   },
   {
     id: 'res-002',
+    facilityId: 'fac-001',
     name: '田中 トシ',
     nameKana: 'タナカ トシ',
     age: 84,
@@ -75,6 +77,7 @@ export const INITIAL_RESIDENTS: Resident[] = [
   },
   {
     id: 'res-003',
+    facilityId: 'fac-001',
     name: '鈴木 敏子',
     nameKana: 'スズキ トシコ',
     age: 88,
@@ -111,11 +114,12 @@ export const INITIAL_RESIDENTS: Resident[] = [
   },
   {
     id: 'res-004',
+    facilityId: 'fac-002',
     name: '山本 健一',
     nameKana: 'ヤマモト ケンイチ',
     age: 74,
     gender: '男性',
-    roomNumber: '207号室',
+    roomNumber: '居宅 (世田谷)',
     careLevel: '要介護1',
     primaryDiagnosis: ['パーキンソン病（ヤールIII度）', '起立性低血圧'],
     mobilityStatus: '独歩可能だがすくみ足・突進歩行あり。リズム体操を実施。',
@@ -139,6 +143,7 @@ export const INITIAL_RESIDENTS: Resident[] = [
   },
   {
     id: 'res-005',
+    facilityId: 'fac-001',
     name: '小林 幸子',
     nameKana: 'コバヤシ サチコ',
     age: 91,
@@ -182,11 +187,12 @@ export const INITIAL_RESIDENTS: Resident[] = [
   },
   {
     id: 'res-006',
+    facilityId: 'fac-002',
     name: '渡辺 喜久男',
     nameKana: 'ワタナベ キクオ',
     age: 82,
     gender: '男性',
-    roomNumber: '212号室',
+    roomNumber: '居宅 (代沢)',
     careLevel: '要介護2',
     primaryDiagnosis: ['変形性膝関節症', '糖尿病', '高脂血症'],
     mobilityStatus: 'T字杖歩行自立。両膝関節痛あり、階段昇降は手すり使用。',

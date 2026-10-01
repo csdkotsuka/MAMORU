@@ -33,8 +33,10 @@ export interface AlertEvent {
   severity: 'WARNING' | 'CRITICAL';
 }
 
+// 第3層：利用者（Resident）
 export interface Resident {
   id: string;
+  facilityId: string;           // 所属事業所ID
   name: string;
   nameKana: string;
   age: number;
@@ -70,4 +72,28 @@ export interface AIAssessmentResponse {
   suspectedConditionAndAction: string;
   nursingRecordText: string;
   isMockFallback?: boolean;
+}
+
+// 第2層：事業所（Facility: 老健、特養、グループホーム、訪問看護等）
+export interface Facility {
+  id: string;
+  organizationId: string;       // 所属管理者（自社）ID
+  name: string;
+  type: '老健' | '特別養護老人ホーム' | 'グループホーム' | '訪問看護ステーション' | '有料老人ホーム';
+  address: string;
+  phone: string;
+  managerName: string;
+  floors: string[];             // 例: ["1F デイケア", "2F 一般棟", "3F 認知症専門棟"]
+  totalBeds: number;
+  activeSensors: number;
+}
+
+// 第1層：管理者（自社 / プラットフォーム運営）
+export interface Organization {
+  id: string;
+  name: string;                 // 例: 株式会社MAMORUケアシステムズ
+  plan: 'Enterprise' | 'Professional' | 'Standard';
+  contactEmail: string;
+  totalFacilitiesCount: number;
+  totalSensorsCount: number;
 }
