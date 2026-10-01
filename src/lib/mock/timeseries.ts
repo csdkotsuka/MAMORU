@@ -76,13 +76,52 @@ export function generateTimeSeriesData(residentId: string, range: TimeRange): Vi
         hr = 118 + Math.floor(Math.random() * 8);
         rr = 25 + Math.floor(Math.random() * 3);
         temp = 37.4;
-        eventNote = '頻脈・体温上昇アラート';
       }
     } else {
       // その他安定
       const noise = Math.floor(Math.sin(i) * 4);
       hr += noise;
       rr += Math.floor(Math.sin(i * 0.5) * 2);
+    }
+
+    // 生活バイタル（食事・水分・活気度）の計算
+    // 日数が経過する（直近に近づく i が小さくなる）につれての臨床トレンド
+    let meal = 80;
+    let water = 1250;
+    let vitality = 4;
+
+    if (isSato) {
+      // 佐藤様：水分・食事・活気が直近に向かって低下傾向
+      const daysAgo = i / 24;
+      if (daysAgo <= 1) {
+        meal = 45 + (hour === 8 || hour === 12 || hour === 18 ? 5 : 0);
+        water = 820;
+        vitality = 2; // 反応鈍い・やや傾眠
+      } else if (daysAgo <= 2) {
+        meal = 65;
+        water = 1050;
+        vitality = 3; // やや活気低下
+      } else {
+        meal = 85;
+        water = 1350;
+        vitality = 4; // 普段通り
+      }
+    } else if (isKobayashi) {
+      // 小林様：直近の発熱に伴い活気・食事急低下
+      if (i <= 12) {
+        meal = 20;
+        water = 600;
+        vitality = 1; // ぐったり
+      } else {
+        meal = 60;
+        water = 1000;
+        vitality = 3;
+      }
+    } else {
+      // 通常
+      meal = Math.max(50, Math.min(100, Math.floor(75 + Math.sin(i * 0.2) * 15)));
+      water = Math.max(900, Math.min(1600, Math.floor(1300 + Math.sin(i * 0.3) * 250)));
+      vitality = Math.max(3, Math.min(5, Math.floor(4 + Math.sin(i * 0.1))));
     }
 
     points.push({
@@ -94,6 +133,9 @@ export function generateTimeSeriesData(residentId: string, range: TimeRange): Vi
       activityLevel: activity,
       isOutOfBed,
       eventNote,
+      mealPercentage: meal,
+      waterIntakeMl: water,
+      vitalityScore: vitality,
     });
   }
 

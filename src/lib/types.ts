@@ -61,6 +61,10 @@ export interface VitalTimeSeriesPoint {
   activityLevel: number;  // 0 - 100
   isOutOfBed: boolean;
   eventNote?: string;     // アラート注記
+  // 生活バイタル（食事・水分・活気）
+  mealPercentage?: number;   // 食事摂取率 0 - 100%
+  waterIntakeMl?: number;    // 水分量 ml
+  vitalityScore?: number;    // 活気・表情レベル 1 - 5 (5:最良)
 }
 
 export interface AIAssessmentResponse {
@@ -88,8 +92,10 @@ export interface DailyCareRecord {
   respirationRate?: number;   // 呼吸数 (/分)
   spo2?: number;              // SpO2 (%)
   // 経過・介護様子
-  mealIntake?: string;        // 食事摂取量 (例: "主食全量 / 副食8割")
+  mealPercentage?: number;    // 食事摂取率 (0-100%)
+  mealIntake?: string;        // 食事摂取量テキスト (例: "主食全量 / 副食8割")
   waterIntakeMl?: number;     // 水分摂取量 (ml)
+  vitalityScore?: number;     // 活気レベル (1-5)
   excretionNote?: string;     // 排泄記録 (例: "排便あり(普通便)、排尿正常")
   notes: string;              // 経過観察・特記事項メモ
 }

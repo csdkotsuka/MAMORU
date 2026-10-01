@@ -33,7 +33,9 @@ export const VitalRecordModal: React.FC<VitalRecordModalProps> = ({
   const [respirationRate, setRespirationRate] = useState<number | ''>(resident.currentVital.respirationRate);
 
   const [mealIntake, setMealIntake] = useState('主食全量 / 副食9割');
+  const [mealPercentage, setMealPercentage] = useState<number>(90);
   const [waterIntakeMl, setWaterIntakeMl] = useState<number | ''>(200);
+  const [vitalityScore, setVitalityScore] = useState<number>(4);
   const [excretionNote, setExcretionNote] = useState('排尿正常、排便あり(普通便)');
   const [notes, setNotes] = useState('リハビリ前バイタル測定。自覚症状なし。歩行器歩行訓練を無理のない範囲で実施。');
 
@@ -65,8 +67,10 @@ export const VitalRecordModal: React.FC<VitalRecordModalProps> = ({
       heartRate: heartRate === '' ? undefined : Number(heartRate),
       respirationRate: respirationRate === '' ? undefined : Number(respirationRate),
       spo2: spo2 === '' ? undefined : Number(spo2),
+      mealPercentage: Number(mealPercentage),
       mealIntake,
       waterIntakeMl: waterIntakeMl === '' ? undefined : Number(waterIntakeMl),
+      vitalityScore: Number(vitalityScore),
       excretionNote,
       notes,
     };
@@ -228,19 +232,65 @@ export const VitalRecordModal: React.FC<VitalRecordModalProps> = ({
           </div>
 
           {/* 2. 食事・水分・排泄 */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">2. 食事・水分・排泄状況</h4>
+          {/* 2. 食事・水分・活気度・排泄 */}
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">2. 食事・水分・活気レベル・排泄</h4>
+
+            {/* 活気・表情レベル 5段階スケール */}
+            <div className="bg-amber-50/50 p-3.5 rounded-2xl border border-amber-200/80 space-y-2">
+              <label className="block text-xs font-bold text-amber-900 flex items-center justify-between">
+                <span>活気・表情・反応レベル（客観スケール）*</span>
+                <span className="text-[11px] text-amber-700 font-semibold">選択中: レベル {vitalityScore}</span>
+              </label>
+              <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
+                {[
+                  { score: 5, emoji: '😊', label: '笑顔・良好' },
+                  { score: 4, emoji: '🙂', label: '普段通り' },
+                  { score: 3, emoji: '😐', label: '傾眠・低下' },
+                  { score: 2, emoji: '🙁', label: '反応鈍い' },
+                  { score: 1, emoji: '😴', label: '無反応' },
+                ].map((item) => (
+                  <button
+                    key={item.score}
+                    type="button"
+                    onClick={() => setVitalityScore(item.score)}
+                    className={`p-2 rounded-xl text-center border transition-all ${
+                      vitalityScore === item.score
+                        ? 'bg-amber-500 text-white font-bold border-amber-600 shadow-sm scale-105'
+                        : 'bg-white text-slate-700 border-slate-200 hover:bg-amber-50'
+                    }`}
+                  >
+                    <div className="text-xl sm:text-2xl">{item.emoji}</div>
+                    <div className="text-[10px] mt-0.5 leading-tight font-medium">{item.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">食事摂取量</label>
-                <input
-                  type="text"
-                  value={mealIntake}
-                  onChange={(e) => setMealIntake(e.target.value)}
-                  placeholder="例: 主食全量 / 副食8割"
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:ring-2 focus:ring-emerald-500 outline-none"
-                />
+                <label className="block text-xs font-bold text-slate-700 mb-1 flex items-center justify-between">
+                  <span>食事摂取割合 ({mealPercentage}%)</span>
+                  <span className="text-[11px] text-slate-400 font-normal">0〜100%</span>
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="10"
+                    value={mealPercentage}
+                    onChange={(e) => setMealPercentage(Number(e.target.value))}
+                    className="flex-1 accent-emerald-600"
+                  />
+                  <input
+                    type="text"
+                    value={mealIntake}
+                    onChange={(e) => setMealIntake(e.target.value)}
+                    placeholder="主食全量/副食8割"
+                    className="w-1/2 px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-emerald-500 outline-none"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">水分摂取量 (ml)</label>
