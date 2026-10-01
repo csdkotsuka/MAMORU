@@ -153,3 +153,37 @@ export function simulateEvent(
 
   notifyListeners();
 }
+
+// 新規利用者の追加
+export function addResident(newResident: Resident) {
+  residentsState.unshift(newResident);
+  notifyListeners();
+
+  // Firestore連携が有効なら非同期で同期
+  if (typeof window !== 'undefined') {
+    import('@/lib/firebase/config').then(({ db, isFirebaseConfigured }) => {
+      if (isFirebaseConfigured) {
+        import('firebase/firestore').then(({ doc, setDoc }) => {
+          setDoc(doc(db, 'residents', newResident.id), newResident, { merge: true }).catch(console.error);
+        });
+      }
+    }).catch(console.error);
+  }
+}
+
+// 利用者情報の更新
+export function updateResident(updatedResident: Resident) {
+  residentsState = residentsState.map((r) => (r.id === updatedResident.id ? updatedResident : r));
+  notifyListeners();
+
+  if (typeof window !== 'undefined') {
+    import('@/lib/firebase/config').then(({ db, isFirebaseConfigured }) => {
+      if (isFirebaseConfigured) {
+        import('firebase/firestore').then(({ doc, setDoc }) => {
+          setDoc(doc(db, 'residents', updatedResident.id), updatedResident, { merge: true }).catch(console.error);
+        });
+      }
+    }).catch(console.error);
+  }
+}
+

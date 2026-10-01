@@ -2,13 +2,14 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { subscribeToResidents, getResidents } from '@/lib/mock/stream';
+import { subscribeToResidents, getResidents, addResident } from '@/lib/mock/stream';
 import { INITIAL_FACILITIES } from '@/lib/mock/facilities';
 import { Resident, Facility } from '@/lib/types';
 import { VitalCard } from '@/components/dashboard/VitalCard';
 import { AlertBanner } from '@/components/dashboard/AlertBanner';
 import { StreamSimulator } from '@/components/simulation/StreamSimulator';
-import { Users, AlertCircle, AlertTriangle, Building2, Radio, MapPin, Phone, UserCheck } from 'lucide-react';
+import { ResidentFormModal } from '@/components/dashboard/ResidentFormModal';
+import { Users, AlertCircle, AlertTriangle, Building2, Radio, MapPin, Phone, UserCheck, UserPlus } from 'lucide-react';
 
 function DashboardContent() {
   const searchParams = useSearchParams();
@@ -18,6 +19,7 @@ function DashboardContent() {
   const [selectedFacilityId, setSelectedFacilityId] = useState<string>(initialFacilityId);
   const [filter, setFilter] = useState<'ALL' | 'ALERT_ONLY' | 'OUT_OF_BED'>('ALL');
   const [isClient, setIsClient] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -225,6 +227,15 @@ function DashboardContent() {
             離床・起き上がり ({outOfBedCount})
           </button>
         </div>
+
+        {/* 新規利用者追加ボタン */}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <UserPlus className="w-4 h-4" />
+          <span>＋ 新規利用者を登録</span>
+        </button>
       </div>
 
       {/* 利用者カード一覧グリッド */}
@@ -233,6 +244,13 @@ function DashboardContent() {
           <VitalCard key={resident.id} resident={resident} />
         ))}
       </div>
+
+      {/* 新規登録モーダル */}
+      <ResidentFormModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSave={(newRes) => addResident(newRes)}
+      />
     </div>
   );
 }

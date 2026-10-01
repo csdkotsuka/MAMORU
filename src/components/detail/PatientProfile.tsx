@@ -1,15 +1,25 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Resident } from '@/lib/types';
-import { User, Activity, Heart, Wind, Thermometer, BedDouble, AlertCircle, FileText, CheckCircle2 } from 'lucide-react';
+import { User, Activity, Heart, Wind, Thermometer, BedDouble, AlertCircle, FileText, CheckCircle2, Edit3 } from 'lucide-react';
+import { ResidentFormModal } from '@/components/dashboard/ResidentFormModal';
+import { updateResident } from '@/lib/mock/stream';
 
 interface PatientProfileProps {
   resident: Resident;
 }
 
-export const PatientProfile: React.FC<PatientProfileProps> = ({ resident }) => {
+export const PatientProfile: React.FC<PatientProfileProps> = ({ resident: initialResident }) => {
+  const [resident, setResident] = useState<Resident>(initialResident);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
   const { currentVital, baseline } = resident;
+
+  const handleSave = (updated: Resident) => {
+    setResident(updated);
+    updateResident(updated);
+  };
 
   return (
     <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm mb-6">
@@ -35,9 +45,19 @@ export const PatientProfile: React.FC<PatientProfileProps> = ({ resident }) => {
               </span>
             </div>
 
-            <h2 className="text-2xl font-black text-slate-900 mt-1">
-              {resident.name} <span className="text-sm font-normal text-slate-400">様</span>
-            </h2>
+            <div className="flex items-center gap-3 mt-1">
+              <h2 className="text-2xl font-black text-slate-900">
+                {resident.name} <span className="text-sm font-normal text-slate-400">様</span>
+              </h2>
+              <button
+                onClick={() => setIsEditModalOpen(true)}
+                className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold transition-colors"
+                title="利用者情報やベースラインを編集"
+              >
+                <Edit3 className="w-3.5 h-3.5" />
+                <span>編集</span>
+              </button>
+            </div>
 
             {/* 既往歴 */}
             <div className="flex flex-wrap items-center gap-1.5 mt-2">
@@ -137,6 +157,14 @@ export const PatientProfile: React.FC<PatientProfileProps> = ({ resident }) => {
           <span>{resident.notes}</span>
         </div>
       </div>
+
+      {/* 編集モーダル */}
+      <ResidentFormModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSave}
+        initialData={resident}
+      />
     </div>
   );
 };
