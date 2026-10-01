@@ -76,6 +76,7 @@ export interface AIAssessmentResponse {
   suspectedConditionAndAction: string;
   nursingRecordText: string;
   isMockFallback?: boolean;
+  modelUsed?: string;
 }
 
 // 日々のバイタル・介護経過記録（スタッフ手動入力）

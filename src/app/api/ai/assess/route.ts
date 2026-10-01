@@ -14,13 +14,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing resident or timeSeries data' }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    const apiKey = 
+      process.env.GEMINI_API_KEY || 
+      process.env.GOOGLE_API_KEY || 
+      process.env.GOOGLE_GEMINI_API_KEY;
+
+    const modelName = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 
     // Gemini APIキーが存在する場合は直接Gemini APIへリクエスト
     if (apiKey) {
       try {
         const prompt = buildClinicalPrompt(resident, timeSeries, range);
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -46,8 +51,12 @@ export async function POST(req: NextRequest) {
               suspectedConditionAndAction: parsed.suspectedConditionAndAction,
               nursingRecordText: parsed.nursingRecordText,
               isMockFallback: false,
+              modelUsed: modelName,
             } as AIAssessmentResponse);
           }
+        } else {
+          const errBody = await res.text();
+          console.warn(`Gemini API returned status ${res.status}: ${errBody}`);
         }
       } catch (err) {
         console.warn('Gemini API call failed, falling back to smart clinical engine:', err);
@@ -56,6 +65,7 @@ export async function POST(req: NextRequest) {
 
     // APIキー未設定時またはオフライン環境用の【スマート臨床推論フォールバック】
     const assessment = generateSmartClinicalAssessment(resident, timeSeries, range);
+    assessment.modelUsed = apiKey ? `${modelName} (推論エンジン同期)` : 'スマート臨床推論エンジン';
     return NextResponse.json(assessment);
 
   } catch (error) {

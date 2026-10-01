@@ -97,8 +97,8 @@ export const AIAnalyzer: React.FC<AIAnalyzerProps> = ({
           <div>
             <h3 className="font-bold text-base text-slate-900 flex items-center gap-2">
               <span>時系列AIアセスメント＆急変予兆検知エンジン</span>
-              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 border border-indigo-200">
-                PT & Clinical AI
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gradient-to-r from-purple-50 to-indigo-50 text-indigo-700 border border-indigo-200">
+                Gemini 3.8 Flash & Clinical AI
               </span>
             </h3>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -164,11 +164,15 @@ export const AIAnalyzer: React.FC<AIAnalyzerProps> = ({
               <span className="text-xs text-slate-500 font-semibold">判定結果:</span>
               {getRiskBadge(assessment.riskLevel)}
             </div>
-            <div className="text-[11px] text-slate-400 font-mono">
-              分析完了時刻: {assessment.analyzedAt}
-              {assessment.isMockFallback && (
-                <span className="ml-2 text-indigo-600 font-medium">（臨床推論エンジン）</span>
-              )}
+            <div className="text-[11px] text-slate-400 font-mono flex items-center gap-2">
+              <span>分析完了: {assessment.analyzedAt}</span>
+              <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                !assessment.isMockFallback 
+                  ? 'bg-purple-100 text-purple-700 border border-purple-200' 
+                  : 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+              }`}>
+                {assessment.modelUsed || (!assessment.isMockFallback ? 'Gemini 3.8 Flash' : '臨床推論エンジン')}
+              </span>
             </div>
           </div>
 
