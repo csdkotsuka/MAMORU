@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { getResidentById, getResidents } from '@/lib/mock/stream';
 import { PatientProfile } from '@/components/detail/PatientProfile';
 import { TimeSeriesGraph } from '@/components/detail/TimeSeriesGraph';
+import { CareRecordTimeline } from '@/components/detail/CareRecordTimeline';
 import { AIAnalyzer } from '@/components/detail/AIAnalyzer';
 import { ArrowLeft } from 'lucide-react';
 
@@ -46,10 +47,13 @@ export default async function ResidentDetailPage({ params }: ResidentPageProps) 
       {/* 患者プロファイルヘッダー */}
       <PatientProfile resident={resident} />
 
-      {/* 2カラム構成：時系列グラフ ＆ AIアセスメント */}
+      {/* 詳細セクション群 */}
       <div className="space-y-6">
-        {/* 機能②：時系列データグラフ表示（TimeSeriesGraph側でmounted制御によりHydration保護済み） */}
+        {/* 機能②：時系列データグラフ表示 */}
         <TimeSeriesGraph resident={resident} />
+
+        {/* 日々のバイタル実測＆介護経過記録（日誌） */}
+        <CareRecordTimeline resident={resident} />
 
         {/* 機能③：AIによる時系列アセスメント（予兆検知）生成エンジン */}
         <AIAnalyzer resident={resident} />

@@ -74,6 +74,26 @@ export interface AIAssessmentResponse {
   isMockFallback?: boolean;
 }
 
+// 日々のバイタル・介護経過記録（スタッフ手動入力）
+export interface DailyCareRecord {
+  id: string;
+  residentId: string;
+  recordedAt: string;         // 例: "2026-10-01 14:30"
+  staffName: string;          // 記録スタッフ名
+  // 実測バイタル
+  temperature?: number;       // 実測体温 (℃)
+  bloodPressureSys?: number;  // 収縮期血圧 (mmHg)
+  bloodPressureDia?: number;  // 拡張期血圧 (mmHg)
+  heartRate?: number;         // 脈拍/心拍数 (bpm)
+  respirationRate?: number;   // 呼吸数 (/分)
+  spo2?: number;              // SpO2 (%)
+  // 経過・介護様子
+  mealIntake?: string;        // 食事摂取量 (例: "主食全量 / 副食8割")
+  waterIntakeMl?: number;     // 水分摂取量 (ml)
+  excretionNote?: string;     // 排泄記録 (例: "排便あり(普通便)、排尿正常")
+  notes: string;              // 経過観察・特記事項メモ
+}
+
 // 第2層：事業所（Facility: 老健、特養、グループホーム、訪問看護等）
 export interface Facility {
   id: string;

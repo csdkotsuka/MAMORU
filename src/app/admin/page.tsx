@@ -4,21 +4,62 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { CURRENT_ORGANIZATION, INITIAL_FACILITIES } from '@/lib/mock/facilities';
 import { INITIAL_RESIDENTS } from '@/lib/mock/residents';
-import { Building2, ShieldCheck, Database, CheckCircle2, AlertTriangle, ArrowRight, Radio, Users, Cpu, Layers } from 'lucide-react';
+import {
+  Building2,
+  ShieldCheck,
+  Database,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
+  Radio,
+  Users,
+  Cpu,
+  Layers,
+  Settings,
+  HelpCircle,
+  ExternalLink
+} from 'lucide-react';
 
 export default function AdminDashboardPage() {
-  const [syncStatus, setSyncStatus] = useState<string | null>(null);
+  const [syncStatus, setSyncStatus] = useState<{ success: boolean; message: string; hint?: string } | null>(null);
   const [isSyncing, setIsSyncing] = useState(false);
+  const [showConfigPanel, setShowConfigPanel] = useState(false);
 
-  const handleSyncFirebase = async () => {
+  // 直接入力用
+  const [apiKey, setApiKey] = useState('');
+  const [projectId, setProjectId] = useState('mamoru-510304');
+  const [authDomain, setAuthDomain] = useState('mamoru-510304.firebaseapp.com');
+
+  const handleSyncFirebase = async (directConfig?: any) => {
     setIsSyncing(true);
     setSyncStatus(null);
     try {
-      const res = await fetch('/api/firebase/seed', { method: 'POST' });
+      const payload = directConfig || (apiKey ? { apiKey, projectId, authDomain } : undefined);
+      const res = await fetch('/api/firebase/seed', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload ? JSON.stringify(payload) : undefined,
+      });
+
       const data = await res.json();
-      setSyncStatus(data.message || 'データ同期が完了しました');
+      if (res.ok && data.syncedToFirebase) {
+        setSyncStatus({
+          success: true,
+          message: data.message,
+        });
+      } else {
+        setSyncStatus({
+          success: false,
+          message: data.message || 'データ格納に失敗しました',
+          hint: data.hint,
+        });
+      }
     } catch (e: any) {
-      setSyncStatus('同期処理中にエラーが発生しました');
+      setSyncStatus({
+        success: false,
+        message: 'サーバー通信エラーが発生しました',
+        hint: 'インターネット接続またはNext.jsサーバーの稼働状態をご確認ください。',
+      });
     } finally {
       setIsSyncing(false);
     }
@@ -46,24 +87,107 @@ export default function AdminDashboardPage() {
 
         {/* Firebase同期アクション */}
         <div className="flex flex-col items-end gap-1.5">
-          <button
-            onClick={handleSyncFirebase}
-            disabled={isSyncing}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
-          >
-            <Database className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-            <span>{isSyncing ? 'Firebaseに同期中...' : 'Firestoreへ初期データを投入'}</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => handleSyncFirebase()}
+              disabled={isSyncing}
+              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs shadow-md shadow-orange-500/20 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+            >
+              <Database className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
+              <span>{isSyncing ? 'Firestoreに投入中...' : 'Firestoreへ初期データを投入'}</span>
+            </button>
+            <button
+              onClick={() => setShowConfigPanel(!showConfigPanel)}
+              className="p-2.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-600 transition-colors"
+              title="Firebase接続設定を開く"
+            >
+              <Settings className="w-4 h-4" />
+            </button>
+          </div>
           <span className="text-[10px] text-slate-400">
-            ※ 3層構造（自社・事業所・利用者・時系列ログ）を一括格納
+            ※ 3層構造（自社・事業所3拠点・利用者6名）をFirestoreへ一括格納
           </span>
         </div>
       </div>
 
+      {/* 同期ステータスアラート */}
       {syncStatus && (
-        <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs flex items-center gap-2.5 animate-fadeIn">
-          <CheckCircle2 className="w-4 h-4 text-blue-600 flex-shrink-0" />
-          <span className="font-medium">{syncStatus}</span>
+        <div
+          className={`p-4 rounded-2xl border text-xs sm:text-sm animate-fadeIn space-y-1 ${
+            syncStatus.success
+              ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+              : 'bg-red-50 border-red-300 text-red-900'
+          }`}
+        >
+          <div className="flex items-center gap-2 font-bold">
+            {syncStatus.success ? (
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+            ) : (
+              <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0" />
+            )}
+            <span>{syncStatus.message}</span>
+          </div>
+          {syncStatus.hint && (
+            <p className="text-xs ml-7 text-slate-700 bg-white/80 p-2.5 rounded-xl border border-slate-200 mt-2 font-medium">
+              💡 <strong>解決手順:</strong> {syncStatus.hint}
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Firebase手動設定・投入パネル */}
+      {showConfigPanel && (
+        <div className="p-5 rounded-2xl bg-amber-50/60 border border-amber-200 text-slate-800 space-y-4 animate-fadeIn">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-sm text-amber-900 flex items-center gap-2">
+              <Database className="w-4 h-4 text-amber-600" />
+              <span>Firebase接続クイック設定（Vercel再デプロイ不要で直接投入可能）</span>
+            </h3>
+            <span className="text-xs text-amber-700 font-medium">mamoru-510304</span>
+          </div>
+
+          <p className="text-xs text-slate-600 leading-relaxed">
+            Vercelの環境変数設定を待たずに、Firebase Consoleで取得した「Web API Key」をここに貼り付けて「今すぐ投入」を押すと、即座にFirestoreにコレクションが作成されます。
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                Firebase Web API Key (apiKey) *
+              </label>
+              <input
+                type="text"
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                placeholder="AIzaSy..."
+                className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-amber-500 outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                Project ID (projectId)
+              </label>
+              <input
+                type="text"
+                value={projectId}
+                onChange={(e) => setProjectId(e.target.value)}
+                className="w-full px-3 py-2 rounded-xl bg-white border border-slate-300 text-xs font-mono focus:ring-2 focus:ring-amber-500 outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-2">
+            <div className="text-[11px] text-slate-500">
+              ※ 事前にFirebaseコンソールで<strong>「Firestore Databaseの作成」</strong>と<strong>「ルールをテストモード」</strong>にしておいてください。
+            </div>
+            <button
+              onClick={() => handleSyncFirebase({ apiKey, projectId, authDomain })}
+              disabled={isSyncing || !apiKey.trim()}
+              className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-sm transition-all disabled:opacity-50"
+            >
+              この設定値でFirestoreに直接投入
+            </button>
+          </div>
         </div>
       )}
 
