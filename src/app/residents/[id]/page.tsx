@@ -5,7 +5,9 @@ import { getResidentById, getResidents } from '@/lib/mock/stream';
 import { PatientProfile } from '@/components/detail/PatientProfile';
 import { TimeSeriesGraph } from '@/components/detail/TimeSeriesGraph';
 import { AIAnalyzer } from '@/components/detail/AIAnalyzer';
-import { ChevronLeft, ArrowLeft, ShieldAlert } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+
+export const dynamicParams = true;
 
 interface ResidentPageProps {
   params: Promise<{ id: string }>;
@@ -46,7 +48,7 @@ export default async function ResidentDetailPage({ params }: ResidentPageProps) 
 
       {/* 2カラム構成：時系列グラフ ＆ AIアセスメント */}
       <div className="space-y-6">
-        {/* 機能②：時系列データグラフ表示 */}
+        {/* 機能②：時系列データグラフ表示（TimeSeriesGraph側でmounted制御によりHydration保護済み） */}
         <TimeSeriesGraph resident={resident} />
 
         {/* 機能③：AIによる時系列アセスメント（予兆検知）生成エンジン */}

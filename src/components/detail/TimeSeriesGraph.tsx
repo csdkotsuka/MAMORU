@@ -15,7 +15,7 @@ import {
 } from 'recharts';
 import { VitalTimeSeriesPoint, Resident } from '@/lib/types';
 import { generateTimeSeriesData, TimeRange } from '@/lib/mock/timeseries';
-import { Activity, Clock, Heart, Wind, Calendar } from 'lucide-react';
+import { Activity, Clock, Heart, Wind, Calendar, RefreshCw } from 'lucide-react';
 
 interface TimeSeriesGraphProps {
   resident: Resident;
@@ -23,8 +23,13 @@ interface TimeSeriesGraphProps {
 }
 
 export const TimeSeriesGraph: React.FC<TimeSeriesGraphProps> = ({ resident, onDataChange }) => {
+  const [mounted, setMounted] = React.useState(false);
   const [range, setRange] = useState<TimeRange>('3d');
   const [activeMetric, setActiveMetric] = useState<'all' | 'vitalOnly' | 'activityOnly'>('all');
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const data = generateTimeSeriesData(resident.id, range);
 
@@ -154,7 +159,13 @@ export const TimeSeriesGraph: React.FC<TimeSeriesGraphProps> = ({ resident, onDa
       </div>
 
       {/* Recharts グラフ本体 */}
-      <div className="w-full h-80 pt-2">
+      <div className="w-full h-80 pt-2 flex items-center justify-center">
+        {!mounted ? (
+          <div className="flex flex-col items-center justify-center gap-2 text-slate-400">
+            <RefreshCw className="w-6 h-6 animate-spin text-blue-500" />
+            <span className="text-xs">時系列グラフをレンダリング中...</span>
+          </div>
+        ) : (
         <ResponsiveContainer width="100%" height="100%">
           <ComposedChart data={data} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -243,6 +254,7 @@ export const TimeSeriesGraph: React.FC<TimeSeriesGraphProps> = ({ resident, onDa
             />
           </ComposedChart>
         </ResponsiveContainer>
+        )}
       </div>
 
       <div className="mt-3 text-right">
