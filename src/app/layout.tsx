@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Link from 'next/link';
-import { Activity, Building2, Layers, Database } from 'lucide-react';
+import { Activity, Building2, Layers, Database, Sparkles } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'MAMORU - 3層構造 IoTセンサー連携＆時系列AIバイタル監視システム',
@@ -42,6 +42,13 @@ export default function RootLayout({
 
               {/* 3層ナビゲーションタブ */}
               <nav className="hidden md:flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl text-xs font-semibold">
+                <Link
+                  href="/about"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white transition-all"
+                >
+                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                  <span>サービス紹介 (PR)</span>
+                </Link>
                 <Link
                   href="/admin"
                   className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 hover:bg-white transition-all"
