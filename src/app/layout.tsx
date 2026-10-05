@@ -1,11 +1,21 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import Link from 'next/link';
-import { Activity, Building2, Layers, Database, Sparkles } from 'lucide-react';
+import Image from 'next/image';
+import { Building2, Layers, Database, Sparkles } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'MAMORU - 3層構造 IoTセンサー連携＆時系列AIバイタル監視システム',
   description: '自社本部・事業所・利用者の3層管理によるリアルタイムバイタル監視＆時系列AI予兆検知プラットフォーム',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '32x32' },
+      { url: '/icon.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -22,8 +32,15 @@ export default function RootLayout({
             {/* ロゴ */}
             <div className="flex items-center gap-6">
               <Link href="/" className="flex items-center gap-3 group">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-700 via-blue-600 to-cyan-500 flex items-center justify-center shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
-                  <Activity className="w-6 h-6 text-white animate-pulse" />
+                <div className="relative w-10 h-10 rounded-xl overflow-hidden shadow-md shadow-blue-500/10 group-hover:scale-105 transition-transform border border-slate-200/80 bg-white flex-shrink-0 flex items-center justify-center">
+                  <Image
+                    src="/logo.png"
+                    alt="MAMORU ロゴ"
+                    width={40}
+                    height={40}
+                    className="w-full h-full object-cover"
+                    priority
+                  />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
@@ -97,7 +114,17 @@ export default function RootLayout({
         </main>
 
         {/* フッター */}
-        <footer className="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+        <footer className="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500">
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <Image
+              src="/logo.png"
+              alt="MAMORU"
+              width={20}
+              height={20}
+              className="rounded-md object-cover"
+            />
+            <span className="font-bold text-slate-700 tracking-tight">MAMORU</span>
+          </div>
           <p>© 2026 MAMORU 3-Tier IoT & Clinical AI Platform. Powered by Firebase & Next.js.</p>
         </footer>
       </body>
